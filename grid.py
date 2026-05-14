@@ -6,6 +6,14 @@ class Grid:
         """Inicjalizacja siatki o danej wielkości"""
         self._grid: np.ndarray = np.zeros((rows, cols), dtype=np.bool_)
 
+    @classmethod
+    def from_data(cls, data: np.ndarray):
+        """Inicjalizacja obiektu z istniejącej siatki (NIE kopiuje)"""
+        grid = cls(*data.shape)
+        grid.data = data
+
+        return grid
+
     def _assert_init(self) -> None:
         if self._grid.size == 0:
             raise RuntimeError("Grid isn't initialized")
