@@ -1,4 +1,5 @@
 import numpy as np
+from patterns import get_pattern
 
 _GRID: np.ndarray = np.zeros((0, 0), dtype=np.bool_)
 
@@ -51,3 +52,20 @@ def reset_grid() -> None:
     global _GRID
 
     _GRID[:] = False
+
+def place_pattern(pattern_name: str, start_x: int, start_y: int) -> bool:
+    """Umieszczenie wzoru na siatce począwszy od pozycji (start_x, start_y).
+    Zwraca True jeśli się udało, False jeśli wzór wychodzi poza granice."""
+    assert_init()
+    pattern = get_pattern(pattern_name)
+    if not pattern:
+        return False
+    
+    rows, cols = _GRID.shape
+    for dx, dy in pattern:
+        x, y = start_x + dx, start_y + dy
+        if 0 <= x < cols and 0 <= y < rows:
+            set_cell(x, y, True)
+        else:
+            return False 
+    return True
