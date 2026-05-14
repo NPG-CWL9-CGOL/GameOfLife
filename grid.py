@@ -35,6 +35,12 @@ class Grid:
         """Ustawienie siatki z innej siatki (kopiuje)"""
         self._grid = arr.astype(np.bool_).copy()
 
+    def set_grid_from_active(self, cells: list[tuple[int, int]]) -> None:
+        """Ustawienie siatki z listy aktywnych komórek"""
+        self._assert_init()
+        for x, y in cells:
+            self.set_cell(x, y, True)
+
     def reset_grid(self) -> None:
         """Wyczyszczenie siatki do stanu początkowego (same '0')"""
         self._assert_init()
@@ -54,7 +60,7 @@ class Grid:
             if 0 <= x < cols and 0 <= y < rows:
                 self.set_cell(x, y, True)
             else:
-                return False  # Wzór wychodzi poza granice
+                return False  
         return True
 
     @property
