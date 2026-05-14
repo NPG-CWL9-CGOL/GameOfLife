@@ -1,4 +1,5 @@
 import numpy as np
+from patterns import get_pattern
 
 
 class Grid:
@@ -34,16 +35,27 @@ class Grid:
         """Ustawienie siatki z innej siatki (kopiuje)"""
         self._grid = arr.astype(np.bool_).copy()
 
-    def set_grid_from_active(self, cells: list[tuple[int, int]]) -> None:
-        """Ustawienie siatki z listy aktywnych komórek"""
-        self._assert_init()
-        for x, y in cells:
-            self.set_cell(x, y, True)
-
     def reset_grid(self) -> None:
         """Wyczyszczenie siatki do stanu początkowego (same '0')"""
         self._assert_init()
         self._grid[:] = False
+
+    def place_pattern(self, pattern_name: str, start_x: int, start_y: int) -> bool:
+        """Umieszczenie wzoru na siatce począwszy od pozycji (start_x, start_y).
+        Zwraca True jeśli się udało, False jeśli wzór wychodzi poza granice."""
+        self._assert_init()
+        pattern = get_pattern(pattern_name)
+        if not pattern:
+            return False
+        
+        rows, cols = self._grid.shape
+        for dx, dy in pattern:
+            x, y = start_x + dx, start_y + dy
+            if 0 <= x < cols and 0 <= y < rows:
+                self.set_cell(x, y, True)
+            else:
+                return False  # Wzór wychodzi poza granice
+        return True
 
     @property
     def shape(self) -> tuple[int, ...]:
