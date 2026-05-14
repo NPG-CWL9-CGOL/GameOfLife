@@ -1,4 +1,5 @@
 import pygame
+from grid import Grid
 
 
 #ustawienia okna aplikacji
@@ -9,6 +10,7 @@ WINDOW_TITLE = "Conway's Game of Life"
 
 
 def main():
+    grid = Grid(100, 100)
     pygame.init()
 
     #okno aplikacji
