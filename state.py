@@ -23,7 +23,7 @@ class ProjectState:
             return cls(
                 project_path,
                 name,
-                Grid(grid_data)
+                Grid.from_data(grid_data)
             )
 
     def save(self):
