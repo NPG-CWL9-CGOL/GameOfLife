@@ -10,7 +10,7 @@ class Grid:
     def from_data(cls, data: np.ndarray):
         """Inicjalizacja obiektu z istniejącej siatki (NIE kopiuje)"""
         grid = cls(*data.shape)
-        grid.data = data
+        grid._grid = data
 
         return grid
 
