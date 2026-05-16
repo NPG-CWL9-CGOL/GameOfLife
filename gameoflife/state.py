@@ -1,6 +1,6 @@
 import numpy as np
 
-from grid import Grid
+from gameoflife.grid import Grid
 
 class ProjectState:
     """Obsługa stanu projektu - obsługa plików"""

@@ -1,5 +1,5 @@
 import numpy as np
-from patterns import get_pattern
+from gameoflife.patterns import get_pattern
 
 
 class Grid:

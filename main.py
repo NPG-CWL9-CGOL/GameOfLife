@@ -1,6 +1,6 @@
 import pygame
 import random
-from grid import Grid
+from gameoflife.grid import Grid
 
 
 #ustawienia okna aplikacji
