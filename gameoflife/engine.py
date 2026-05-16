@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.signal import convolve2d
-from grid import Grid
+from gameoflife.grid import Grid
 
 _KERNEL = np.array([
     [1, 1, 1],

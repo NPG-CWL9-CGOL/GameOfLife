@@ -23,9 +23,9 @@ zyskał szczególną popularność ze względu na to, jak z zaledwie 2 prostych 
 
 ```bash
 #Linux/MacOS
-  source activate.sh
+  source scripts/activate.sh
 #Windows
-  activate.bat
+  .\scripts\activate.bat
 ```
 
 3. Otwórz aplikacje
