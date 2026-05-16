@@ -89,6 +89,37 @@ def draw_cells(screen, grid, grid_x, grid_y, cell_size):
                 )
 
 
+def point_in_rect(pos, rect) -> bool:
+    """Sprawdza, czy punkt (x, y) znajduje się w prostokącie."""
+    x, y = pos
+    rx, ry, rw, rh = rect
+    return rx <= x < rx + rw and ry <= y < ry + rh
+
+
+def handle_grid_click(event, grid, grid_x, grid_y, grid_width, grid_height, cell_size, ui_rects, paused):
+    """Obsługa kliknięcia w siatkę, z pominięciem obszarów UI.
+    Nie zmienia stanu komórki, gdy gra jest w trybie pauzy."""
+    if paused:
+        return
+
+    if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
+        return
+
+    mx, my = event.pos
+
+    # bez klikania w UI
+    if any(point_in_rect((mx, my), rect) for rect in ui_rects):
+        return
+
+    if not (grid_x <= mx < grid_x + grid_width and grid_y <= my < grid_y + grid_height):
+        return
+
+    col = (mx - grid_x) // cell_size
+    row = (my - grid_y) // cell_size
+
+    grid.toggle_cell(col, row)
+
+
 def fill_grid_randomly(grid, chance=0.2):
     """Losowo ustawia część komórek jako żywe, żeby było co wizualizować."""
     rows, cols = grid.shape
@@ -127,11 +158,33 @@ def main():
 
     fill_grid_randomly(grid, chance=0.2)
 
+    ui_rects = [
+        (570, 25, 90, 35),
+        (670, 25, 90, 35),
+        (30, 550, 80, 35),
+        (125, 550, 80, 35),
+        (220, 550, 80, 35),
+        (315, 550, 80, 35)
+    ]
+
+    paused = True
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            else:
+                handle_grid_click(
+                    event,
+                    grid,
+                    grid_x,
+                    grid_y,
+                    grid_width,
+                    grid_height,
+                    cell_size,
+                    ui_rects,
+                    paused
+                )
 
         screen.fill(BACKGROUND_COLOR)
 
@@ -146,7 +199,11 @@ def main():
 
         pygame.draw.rect(screen, BOTTOM_PANEL_COLOR, (0, 500, WINDOW_WIDTH, 100))
 
-        status_text = text_font.render("Status: Paused", True, TEXT_COLOR)
+        status_text = text_font.render(
+            f"Status: {'Paused' if paused else 'Running'}",
+            True,
+            TEXT_COLOR
+        )
         screen.blit(status_text, (30, 515))
 
         draw_button(screen, 30, 550, 80, 35, "Start", button_font)
