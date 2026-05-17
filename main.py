@@ -96,10 +96,10 @@ def point_in_rect(pos, rect) -> bool:
     return rx <= x < rx + rw and ry <= y < ry + rh
 
 
-def handle_grid_click(event, grid, grid_x, grid_y, grid_width, grid_height, cell_size, ui_rects, paused):
+def handle_grid_click(event, grid, grid_x, grid_y, grid_width, grid_height, cell_size, ui_rects, editing):
     """Obsługa kliknięcia w siatkę, z pominięciem obszarów UI.
-    Nie zmienia stanu komórki, gdy gra jest w trybie pauzy."""
-    if paused:
+    Zmienia stan komórki tylko w trybie edycji."""
+    if editing is False:
         return
 
     if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
@@ -167,7 +167,7 @@ def main():
         (315, 550, 80, 35)
     ]
 
-    paused = True
+    editing = True 
     running = True
     while running:
         for event in pygame.event.get():
@@ -183,7 +183,7 @@ def main():
                     grid_height,
                     cell_size,
                     ui_rects,
-                    paused
+                    editing
                 )
 
         screen.fill(BACKGROUND_COLOR)
@@ -200,7 +200,7 @@ def main():
         pygame.draw.rect(screen, BOTTOM_PANEL_COLOR, (0, 500, WINDOW_WIDTH, 100))
 
         status_text = text_font.render(
-            f"Status: {'Paused' if paused else 'Running'}",
+            f"Status: {'Editing' if editing else 'Running'}",
             True,
             TEXT_COLOR
         )
