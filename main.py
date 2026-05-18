@@ -95,29 +95,78 @@ def point_in_rect(pos, rect) -> bool:
     rx, ry, rw, rh = rect
     return rx <= x < rx + rw and ry <= y < ry + rh
 
-
-def handle_grid_click(event, grid, grid_x, grid_y, grid_width, grid_height, cell_size, ui_rects, editing):
-    """Obsługa kliknięcia w siatkę, z pominięciem obszarów UI.
-    Zmienia stan komórki tylko w trybie edycji."""
-    if editing is False:
-        return
-
-    if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
-        return
-
-    mx, my = event.pos
-
-    # bez klikania w UI
-    if any(point_in_rect((mx, my), rect) for rect in ui_rects):
-        return
-
+#zamiana wspolrzednych myszy na indeksy komorek w siatce
+def get_grid_cell(pos, grid_x, grid_y, grid_width, grid_height, cell_size):
+    mx, my = pos
     if not (grid_x <= mx < grid_x + grid_width and grid_y <= my < grid_y + grid_height):
-        return
+        return None
 
     col = (mx - grid_x) // cell_size
     row = (my - grid_y) // cell_size
+    return col, row
 
-    grid.toggle_cell(col, row)
+
+def draw_line_on_grid(grid, start_cell, end_cell, state):
+    """Rysuje linię komórek między dwoma punktami na siatce."""
+    x0, y0 = start_cell
+    x1, y1 = end_cell
+    dx = abs(x1 - x0)
+    dy = abs(y1 - y0)
+    sx = 1 if x0 < x1 else -1
+    sy = 1 if y0 < y1 else -1
+    err = dx - dy
+
+    while True:
+        grid.set_cell(x0, y0, state)
+        if x0 == x1 and y0 == y1:
+            break
+        e2 = err * 2
+        if e2 > -dy:
+            err -= dy
+            x0 += sx
+        if e2 < dx:
+            err += dx
+            y0 += sy
+
+#teraz zwracamy stan pędzla zamiast togglowania pojedynczej komorki
+def handle_grid_click(event, grid, grid_x, grid_y, grid_width, grid_height, cell_size, ui_rects, editing):
+    """Obsługa kliknięcia w siatkę, z pominięciem obszarów UI.
+    Zwraca stan pędzla dla przeciągania komórek."""
+    if editing is False:
+        return None, None
+
+    if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
+        return None, None
+
+    if any(point_in_rect(event.pos, rect) for rect in ui_rects):
+        return None, None
+
+    cell = get_grid_cell(event.pos, grid_x, grid_y, grid_width, grid_height, cell_size)
+    if cell is None:
+        return None, None
+
+    col, row = cell
+    current_state = grid.get_cell(col, row)
+    target_state = not current_state
+    draw_line_on_grid(grid, cell, cell, target_state)
+    return target_state, cell
+
+#to reaguje na mousemotion, wazne w nowej petli zdarzen 
+def continue_grid_drag(event, grid, grid_x, grid_y, grid_width, grid_height, cell_size, ui_rects, editing, target_state, previous_cell):
+    """Obsługa przeciągania myszy po siatce w trakcie edycji."""
+    if editing is False or target_state is None or previous_cell is None:
+        return previous_cell
+
+    if any(point_in_rect(event.pos, rect) for rect in ui_rects):
+        return previous_cell
+
+    cell = get_grid_cell(event.pos, grid_x, grid_y, grid_width, grid_height, cell_size)
+    if cell is None:
+        return previous_cell
+
+    if cell != previous_cell:
+        draw_line_on_grid(grid, previous_cell, cell, target_state)
+    return cell
 
 
 def fill_grid_randomly(grid, chance=0.2):
@@ -167,14 +216,16 @@ def main():
         (315, 550, 80, 35)
     ]
 
-    editing = True 
+    editing = True
+    drag_target_state = None
+    drag_previous_cell = None
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            else:
-                handle_grid_click(
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                drag_target_state, drag_previous_cell = handle_grid_click(
                     event,
                     grid,
                     grid_x,
@@ -185,6 +236,23 @@ def main():
                     ui_rects,
                     editing
                 )
+            elif event.type == pygame.MOUSEMOTION and drag_target_state is not None:
+                drag_previous_cell = continue_grid_drag(
+                    event,
+                    grid,
+                    grid_x,
+                    grid_y,
+                    grid_width,
+                    grid_height,
+                    cell_size,
+                    ui_rects,
+                    editing,
+                    drag_target_state,
+                    drag_previous_cell
+                )
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                drag_target_state = None
+                drag_previous_cell = None
 
         screen.fill(BACKGROUND_COLOR)
 
