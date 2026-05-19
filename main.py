@@ -45,18 +45,29 @@ def draw_settings_panel(screen, settings, title_font, text_font, button_font):
     pygame.draw.rect(screen, GRID_BORDER_COLOR, (30, 90, 740, 380), 2)
 
     settings_lines = [
-        f"Cell size: {settings.cell_size}",
-        f"Random fill chance: {settings.random_fill_chance}",
+        "Simulation:",
         f"Simulation speed: {settings.simulation_speed_ms} ms",
-        f"Show grid: {settings.show_grid}",
+        f"Random fill chance: {settings.random_fill_chance}",
         f"Wrap edges: {settings.wrap_edges}",
+        "",
+        "Grid:",
+        f"Grid size: {settings.grid_cols} x {settings.grid_rows}",
+        f"Cell size: {settings.cell_size}",
+        f"Show grid: {settings.show_grid}",
+        "",
+        "Editor:",
+        f"Edit mode enabled: {settings.edit_mode_enabled}",
+        f"Brush size: {settings.brush_size}",
+        "",
+        "Appearance:",
+        f"Show FPS: {settings.show_fps}",
         f"Alive color: {settings.alive_color}",
         f"Dead color: {settings.dead_color}",
     ]
 
     for index, line in enumerate(settings_lines):
         text = text_font.render(line, True, TEXT_COLOR)
-        screen.blit(text, (60, 120 + index * 40))
+        screen.blit(text, (60, 120 + index * 24))
 
 def draw_grid_outline(screen, grid_x, grid_y, grid_width, grid_height, cell_size):
     """

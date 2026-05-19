@@ -12,3 +12,9 @@ class AppSettings:
     wrap_edges: bool = True
     alive_color: tuple[int, int, int] = (120, 220, 130)
     dead_color: tuple[int, int, int] = (40, 45, 55)
+
+    grid_rows: int = 19
+    grid_cols: int = 37
+    edit_mode_enabled: bool = True
+    show_fps: bool = False
+    brush_size: int = 1
