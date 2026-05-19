@@ -1,7 +1,7 @@
 import pygame
 import random
 from gameoflife.grid import Grid
-
+from gameoflife.settings import AppSettings
 
 # Ustawienia okna aplikacji
 WINDOW_WIDTH = 800
@@ -31,6 +31,32 @@ def draw_button(screen, x, y, width, height, text, font):
     text_rect = button_text.get_rect(center=(x + width / 2, y + height / 2))
     screen.blit(button_text, text_rect)
 
+def draw_settings_panel(screen, settings, title_font, text_font, button_font):
+    # Prosty widok ustawien aplikacji
+
+    screen.fill(BACKGROUND_COLOR)
+
+    title_text = title_font.render("Settings", True, TEXT_COLOR)
+    screen.blit(title_text, (30, 25))
+
+    draw_button(screen, 670, 25, 90, 35, "Back", button_font)
+
+    pygame.draw.rect(screen, GRID_BACKGROUND_COLOR, (30, 90, 740, 380))
+    pygame.draw.rect(screen, GRID_BORDER_COLOR, (30, 90, 740, 380), 2)
+
+    settings_lines = [
+        f"Cell size: {settings.cell_size}",
+        f"Random fill chance: {settings.random_fill_chance}",
+        f"Simulation speed: {settings.simulation_speed_ms} ms",
+        f"Show grid: {settings.show_grid}",
+        f"Wrap edges: {settings.wrap_edges}",
+        f"Alive color: {settings.alive_color}",
+        f"Dead color: {settings.dead_color}",
+    ]
+
+    for index, line in enumerate(settings_lines):
+        text = text_font.render(line, True, TEXT_COLOR)
+        screen.blit(text, (60, 120 + index * 40))
 
 def draw_grid_outline(screen, grid_x, grid_y, grid_width, grid_height, cell_size):
     """
@@ -191,6 +217,12 @@ def main():
     text_font = pygame.font.SysFont(None, 28)
     button_font = pygame.font.SysFont(None, 24)
 
+    settings = AppSettings()
+    current_screen = "main"
+
+    settings_button_rect = (670, 25, 90, 35)
+    back_button_rect = (670, 25, 90, 35)
+	
     grid_x = 30
     grid_y = 90
     grid_width = 740
@@ -224,19 +256,31 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                drag_target_state, drag_previous_cell = handle_grid_click(
-                    event,
-                    grid,
-                    grid_x,
-                    grid_y,
-                    grid_width,
-                    grid_height,
-                    cell_size,
-                    ui_rects,
-                    editing
-                )
-            elif event.type == pygame.MOUSEMOTION and drag_target_state is not None:
+                if current_screen == "settings":
+                    if point_in_rect(event.pos, back_button_rect):
+                        current_screen = "main"
+
+                elif point_in_rect(event.pos, settings_button_rect):
+                    current_screen = "settings"
+                    drag_target_state = None
+                    drag_previous_cell = None
+
+                else:
+                    drag_target_state, drag_previous_cell = handle_grid_click(
+                        event,
+                        grid,
+                        grid_x,
+                        grid_y,
+                        grid_width,
+                        grid_height,
+                        cell_size,
+                        ui_rects,
+                        editing
+                    )
+
+            elif event.type == pygame.MOUSEMOTION and current_screen == "main" and drag_target_state is not None:
                 drag_previous_cell = continue_grid_drag(
                     event,
                     grid,
@@ -250,9 +294,16 @@ def main():
                     drag_target_state,
                     drag_previous_cell
                 )
+
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 drag_target_state = None
                 drag_previous_cell = None
+
+        if current_screen == "settings":
+            draw_settings_panel(screen, settings, title_font, text_font, button_font)
+            pygame.display.flip()
+            clock.tick(FPS)
+            continue
 
         screen.fill(BACKGROUND_COLOR)
 
