@@ -1,16 +1,17 @@
 import numpy as np
 
 from gameoflife.grid import Grid
+from gameoflife.settings import AppSettings
 
 class ProjectState:
     """Obsługa stanu projektu - obsługa plików"""
 
-    def __init__(self, project_path, name, grid):
+    def __init__(self, project_path, name, grid, settings=None):
         self.project_path = project_path
         self.name = str(name)
 
         self.grid = grid
-        # self.settings later
+   	self.settings = settings if settings is not None else AppSettings()
 
     @classmethod
     def from_file(cls, project_path):
