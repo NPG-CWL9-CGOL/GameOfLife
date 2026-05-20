@@ -1,6 +1,6 @@
 import numpy as np
 
-from gameoflife.grid import Grid
+from gameoflife.grid import GridData
 from gameoflife.settings import AppSettings
 
 class ProjectState:
@@ -24,7 +24,7 @@ class ProjectState:
             return cls(
                 project_path,
                 name,
-                Grid.from_data(grid_data)
+                GridData.from_data(grid_data)
             )
 
     def save(self):
