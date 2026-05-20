@@ -1,3 +1,5 @@
+import pygame
+
 from dataclasses import dataclass
 
 import gameoflife.config as config
@@ -21,8 +23,9 @@ class ViewText:
     y: int
     
     color: tuple[int, int, int] = config.TEXT_COLOR
+    font: pygame.font.Font
 
 
 @dataclass
 class ViewBackgroundColor:
-    color: tuple[int, int, int]
+    color: tuple[int, int, int] = config.BACKGROUND_COLOR
