@@ -11,7 +11,7 @@ class ProjectState:
         self.name = str(name)
 
         self.grid = grid
-   	self.settings = settings if settings is not None else AppSettings()
+        self.settings = settings if settings is not None else AppSettings()
 
     @classmethod
     def from_file(cls, project_path):
