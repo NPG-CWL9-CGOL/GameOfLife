@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 #wzory podawane jako listy krotek wzgledem wspolrzednych startowych 
 PATTERNS = {
     "oscillators": {

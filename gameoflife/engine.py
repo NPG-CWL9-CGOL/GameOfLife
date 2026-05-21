@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.signal import convolve2d
-from gameoflife.grid import Grid
+from gameoflife.grid import GridData
 
 _KERNEL = np.array([
     [1, 1, 1],
@@ -12,7 +12,7 @@ _KERNEL = np.array([
 class Engine:
     """Moduł odpowiedzialny za przeprowadzenie symulacji"""
 
-    def __init__(self, grid: Grid):
+    def __init__(self, grid: GridData):
         self.grid = grid
 
     def update(self) -> None:

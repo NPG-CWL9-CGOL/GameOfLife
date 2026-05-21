@@ -1,9 +1,11 @@
+"""Moduł konfiguracji ustawień użytkownika aplikacji."""
+
 from dataclasses import dataclass
 
 
 @dataclass
 class AppSettings:
-# Model ustawien aplikacji
+    """Model ustawien aplikacji"""
 
     cell_size: int = 20
     random_fill_chance: float = 0.2
