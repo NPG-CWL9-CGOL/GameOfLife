@@ -2,9 +2,14 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-import gameoflife.config as config
+from gameoflife import config
 from gameoflife.settings import AppSettings
 from gameoflife.ui.views import ViewRect, ViewText
+
+    
+TILTE_FONT = pygame.font.SysFont(None, 48)
+TEXT_FONT = pygame.font.SysFont(None, 28)
+BUTTON_FONT = pygame.font.SysFont(None, 24)
 
 
 class UIComponent(ABC):
@@ -40,8 +45,10 @@ class Button(UIComponent):
         x: int, y: int,
         width: int, height: int,
         text: str,
-        font: pygame.font.Font = pygame.font.SysFont(None, 24)
+        font: pygame.font.Font = BUTTON_FONT
     ):
+        super().__init__()
+
         self.x = x
         self.y = y
         self.width = width
@@ -49,7 +56,7 @@ class Button(UIComponent):
         self.text = text
         self.font = font
 
-        super().__init__()
+        self._click_handlers = []
 
     def get_layout(self):
         self._layout = [
@@ -67,14 +74,26 @@ class Button(UIComponent):
                 color=self.text_color)
         ]
 
+    def on_click(self, callback):
+        """
+        Dodanie funkcji odwołania na kliknięcie.
+        Może być użyte jako dekorator.
+        """
+        if not callable(callback):
+            raise TypeError("The delegate must be a callable function or method.")
+        
+        self._click_handlers.append(callback)
+        return callback
 
-class SettingsPanel(UIComponent):    
-    title_font = pygame.font.SysFont(None, 48)
-    text_font = pygame.font.SysFont(None, 28)
-    button_font = pygame.font.SysFont(None, 24)
+    def click(self):
+        for handler in self._click_handlers:
+            handler()
 
+
+class SettingsPanel(UIComponent):
     def __init__(self, settings: AppSettings):
         super().__init__()
+        
         self.settings = settings
 
         self._subcomponents.extend([
