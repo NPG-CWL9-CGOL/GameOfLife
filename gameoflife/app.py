@@ -131,8 +131,7 @@ class AppRenderer:
         self.grid_renderer = GridRenderer(self.screen)
         self.ui_renderer = UIRenderer(self.screen)
 
-
-    def __del__(self) -> None:        
+        
     def __del__(self) -> None:
         """Zamyka system Pygame przy usuwaniu obiektu."""
         pygame.quit()
