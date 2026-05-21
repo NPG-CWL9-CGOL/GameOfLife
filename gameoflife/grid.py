@@ -1,3 +1,5 @@
+"""Moduł definiujący struktury danych, geometrię i renderowanie siatki Gry w Życie."""
+
 from __future__ import annotations
 
 import random
@@ -12,6 +14,8 @@ from gameoflife.patterns import get_pattern
 
 
 class GridData:
+    """Klasa przechowująca binarną macierz stanu komórek."""
+
     def __init__(self, rows: int = 0, cols: int = 0) -> None:
         """Inicjalizacja siatki o danej wielkości"""
         self._grid: np.ndarray = np.zeros((rows, cols), dtype=np.bool_)
@@ -25,6 +29,7 @@ class GridData:
         return grid
 
     def _assert_init(self) -> None:
+        """Sprawdza czy siatka została poprawnie zainicjalizowana."""
         if self._grid.size == 0:
             raise RuntimeError("Grid isn't initialized")
 
@@ -82,15 +87,19 @@ class GridData:
 
     @property
     def shape(self) -> tuple[int, ...]:
+        """Zwraca wymiary siatki (wiersze, kolumny)."""
         return self._grid.shape
 
     @property
     def data(self) -> np.ndarray:
+        """Zwraca surowe dane siatki jako macierz NumPy."""
         return self._grid
 
 
 
 class GridGeometry:
+    """Klasa definiująca położenie i rozmiar siatki w przestrzeni okna."""
+
     def __init__(self, grid_data: GridData, x: int, y: int, width: int, height: int, cell_size: int):
         self.grid_data = grid_data
 
@@ -101,6 +110,7 @@ class GridGeometry:
         self.cell_size = cell_size
 
     def get_cell(self, pos: tuple[int, int]) -> tuple[int, int] | None:
+        """Przelicza współrzędne pikselowe na indeksy komórki (kolumna, wiersz)."""
         mx, my = pos
         if not (self.x <= mx < self.x + self.width and self.y <= my < self.y + self.height):
             return None
@@ -135,7 +145,10 @@ class GridGeometry:
 
 
 class GridRenderer:
+    """Klasa odpowiedzialna za graficzne przedstawienie siatki na ekranie."""
+
     def __init__(self, screen: pygame.Surface):
+        """Inicjalizuje renderer z dostępem do powierzchni ekranu."""
         self.screen = screen
         
 

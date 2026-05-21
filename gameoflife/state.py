@@ -1,3 +1,5 @@
+"""Moduł odpowiedzialny za zarządzanie stanem projektu i operacje na plikach."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -9,6 +11,7 @@ class ProjectState:
     """Obsługa stanu projektu - obsługa plików"""
 
     def __init__(self, project_path: str, name: str, grid: GridData, settings: AppSettings | None = None):
+        """Inicjalizuje nowy stan projektu z podaną ścieżką, nazwą i danymi siatki."""
         self.project_path = project_path
         self.name = str(name)
 

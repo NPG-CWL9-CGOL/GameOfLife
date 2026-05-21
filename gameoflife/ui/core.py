@@ -1,3 +1,5 @@
+"""Rdzeń systemu interfejsu użytkownika, obsługujący stan i logikę zdarzeń."""
+
 from __future__ import annotations
 
 from gameoflife.grid import GridData, GridGeometry
@@ -22,6 +24,7 @@ UI_RECTS = [
 
 @dataclass
 class UIState:
+    """Klasa przechowująca aktualny stan interfejsu i interakcji użytkownika."""
     settings: AppSettings
 
     editing: bool = True
@@ -31,7 +34,10 @@ class UIState:
 
 
 class UIHandler:
+    """Klasa zarządzająca logiką UI, przechwytywaniem zdarzeń i nawigacją."""
+
     def __init__(self, settings: AppSettings, grid_data: GridData, grid_geometry: GridGeometry):
+        """Inicjalizuje kontroler UI i konfiguruje powiązania przycisków."""
         self.state = UIState(settings=settings)
 
         self.grid_data = grid_data  
@@ -66,6 +72,7 @@ class UIHandler:
 
 
     def get_active_components(self) -> list[UIComponent]:
+        """Zwraca listę komponentów, które powinny być widoczne na obecnym ekranie."""
         return [
             self.global_component.get("main_title"),
             self.global_component.get(self.state.current_screen)
@@ -73,6 +80,7 @@ class UIHandler:
 
 
     def mouse_button_down(self, event: pygame.event.Event) -> None:
+        """Obsługuje wciśnięcie lewego przycisku myszy i deleguje akcje do komponentów."""
         if event.button != 1:
             return
         
@@ -88,6 +96,7 @@ class UIHandler:
 
 
     def mouse_motion(self, event: pygame.event.Event) -> None:
+        """Obsługuje ruch myszy, używany głównie do rysowania na siatce."""
         if self.state.current_screen != "main" or self.state.drag_target_state is None:
             return
         
@@ -95,6 +104,7 @@ class UIHandler:
     
 
     def mouse_button_up(self, event: pygame.event.Event) -> None:
+        """Obsługuje puszczenie przycisku myszy, kończąc proces przeciągania."""
         if event.button != 1:
             return
         
@@ -150,7 +160,10 @@ class UIHandler:
 
 
 class UIRenderer:
+    """Klasa odpowiedzialna za konwersję obiektów View na wywołania rysujące Pygame."""
+
     def __init__(self, screen: pygame.Surface):
+        """Inicjalizuje renderer i ładuje czcionki systemowe."""
         self.screen = screen
 
         self._render_dispatch = {
@@ -168,6 +181,7 @@ class UIRenderer:
 
 
     def render_component(self, component: UIComponent) -> None:
+        """Renderuje wszystkie widoki wchodzące w skład danego komponentu."""
         for view in component.views:
             render_method = self._render_dispatch.get(type(view))
             
@@ -178,6 +192,7 @@ class UIRenderer:
 
 
     def render_rect(self, rect_view: ViewRect) -> None:
+        """Rysuje prostokąt z opcjonalną ramką na ekranie."""
         rect = pygame.Rect(
             rect_view.x,
             rect_view.y,
@@ -195,6 +210,7 @@ class UIRenderer:
 
 
     def render_text(self, text_view: ViewText) -> None:
+        """Rysuje tekst na ekranie, uwzględniając wyśrodkowanie."""
         text = self.fonts[text_view.font].render(
             text_view.text, True, text_view.color)
         
@@ -207,4 +223,5 @@ class UIRenderer:
 
 
     def render_background(self, bg_view: ViewBackgroundColor) -> None:
+        """Wypełnia całą powierzchnię ekranu kolorem tła."""
         self.screen.fill(bg_view.color)

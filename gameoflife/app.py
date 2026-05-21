@@ -1,3 +1,5 @@
+"""Główny moduł aplikacji łączący logikę, interfejs i renderowanie."""
+
 from __future__ import annotations
 
 
@@ -13,6 +15,8 @@ from gameoflife.ui.views import *
 
 
 class App:
+    """Główna klasa zarządzająca cyklem życia aplikacji."""
+
     def __init__(
         self,
         renderer: AppRenderer,
@@ -21,6 +25,7 @@ class App:
         grid_data: GridData,
         grid_geometry: GridGeometry
     ) -> None:
+        """Inicjalizuje aplikację z niezbędnymi modułami i danymi."""
         self.renderer = renderer
         self.ui_handler = ui_handler
         self.settings = settings
@@ -31,6 +36,7 @@ class App:
 
     @classmethod
     def create(cls) -> App:
+        """Metoda fabryczna tworząca w pełni skonfigurowaną instancję aplikacji."""
         renderer = AppRenderer(
             window_size=(config.WINDOW_WIDTH, config.WINDOW_HEIGHT),
             window_title=config.WINDOW_TITLE)
@@ -50,6 +56,7 @@ class App:
 
 
     def run(self) -> None:
+        """Uruchamia główną pętlę aplikacji."""
         clock = pygame.time.Clock()
     
         while self.running:
@@ -69,6 +76,7 @@ class App:
 
 
     def handle_events(self) -> None:
+        """Przetwarza zdarzenia systemowe Pygame (mysz, klawiatura, wyjście)."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -83,6 +91,7 @@ class App:
 
     @staticmethod
     def create_grid(grid_x: int, grid_y: int) -> tuple[GridData, GridGeometry]:
+        """Tworzy i inicjalizuje strukturę danych siatki oraz jej geometrię."""
         grid_width = 740
         grid_height = 380
         cell_size = 20
@@ -111,6 +120,7 @@ class AppRenderer:
     """Moduł odpowiedzialny za renderowanie obrazu"""
     
     def __init__(self, window_size: tuple[int, int], window_title: str) -> None:
+        """Inicjalizuje okno graficzne i systemy renderowania składowych."""
         self.window_size = window_size
         
         pygame.init()
@@ -123,22 +133,28 @@ class AppRenderer:
 
 
     def __del__(self) -> None:        
+    def __del__(self) -> None:
+        """Zamyka system Pygame przy usuwaniu obiektu."""
         pygame.quit()
  
 
     def render_begin(self) -> None:
+        """Przygotowuje klatkę do renderowania (rysuje panel)."""
         pygame.draw.rect(self.screen, config.BOTTOM_PANEL_COLOR, (0, 500, self.window_size[0], 100))
 
 
     def render_grid(self, grid_data: GridData, grid_geometry: GridGeometry) -> None:                
+        """Rysuje siatkę symulacji wraz z jej komórkami."""
         self.grid_renderer.render_outline(grid_geometry)
         self.grid_renderer.render_cells(grid_data, grid_geometry)
 
 
     def render_ui(self, components: list[UIComponent]) -> None:
+        """Renderuje listę aktywnych komponentów interfejsu."""
         for component in components:
             self.ui_renderer.render_component(component)
 
     def render_end(self) -> None:
+        """Czyści tło"""
         pygame.display.flip()
     

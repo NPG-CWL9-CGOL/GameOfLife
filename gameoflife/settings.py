@@ -1,3 +1,5 @@
+"""Moduł konfiguracji ustawień użytkownika aplikacji."""
+
 from dataclasses import dataclass
 
 
