@@ -43,7 +43,11 @@ class App:
 
         settings = AppSettings()
 
-        grid_data, grid_geometry = App.create_grid(grid_x=30, grid_y=90)
+        grid_data, grid_geometry = App.create_grid(
+            grid_pos=config.GRID_POS,
+            grid_size=config.GRID_SIZE,
+            cell_size=config.GRID_CELL_SIZE
+        )
 
         ui_handler = UIHandler(
             settings=settings,
@@ -90,14 +94,11 @@ class App:
 
 
     @staticmethod
-    def create_grid(grid_x: int, grid_y: int) -> tuple[GridData, GridGeometry]:
+    def create_grid(grid_pos: tuple[int, int], grid_size: tuple[int, int], cell_size: int) -> tuple[GridData, GridGeometry]:
         """Tworzy i inicjalizuje strukturę danych siatki oraz jej geometrię."""
-        grid_width = 740
-        grid_height = 380
-        cell_size = 20
-
-        cols = grid_width // cell_size
-        rows = grid_height // cell_size
+        
+        cols = grid_size[0] // cell_size
+        rows = grid_size[1] // cell_size
 
         grid_width = cols * cell_size
         grid_height = rows * cell_size
@@ -105,7 +106,7 @@ class App:
         grid_data = GridData(rows, cols)
         grid_geometry = GridGeometry(
             grid_data=grid_data,
-            x=grid_x, y=grid_y,
+            x=grid_pos[0], y=grid_pos[1],
             width=grid_width, height=grid_height,
             cell_size=cell_size)
         
