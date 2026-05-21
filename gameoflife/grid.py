@@ -1,8 +1,11 @@
+import random
+
 import pygame
 
 import numpy as np
 
-import gameoflife.config as config
+from gameoflife import config
+from gameoflife.math_utils import point_in_rect
 from gameoflife.patterns import get_pattern
 
 
@@ -96,7 +99,6 @@ class GridGeometry:
         self.height = height
         self.cell_size = cell_size
 
-
     def get_cell(self, pos):
         mx, my = pos
         if not (self.x <= mx < self.x + self.width and self.y <= my < self.y + self.height):
@@ -107,51 +109,36 @@ class GridGeometry:
         return col, row
 
 
-    #teraz zwracamy stan pędzla zamiast togglowania pojedynczej komorki
-    def handle_grid_click(self, event, exclude_ui_rects, editing):
-        """Obsługa kliknięcia w siatkę, z pominięciem obszarów UI.
-        Zwraca stan pędzla dla przeciągania komórek."""
-
-        if editing is False:
-            return None, None
-
-        if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
-            return None, None
-
-        if any(GridGeometry.point_in_rect(event.pos, rect) for rect in exclude_ui_rects):
-            return None, None
-
-        cell = self.get_cell(event.pos, self.x, self.y, self.width, self.height, self.cell_size)
+    def draw_line(self, start_cell, end_cell, state):
+        """Rysuje linię komórek między dwoma punktami na siatce."""
         
-        if cell is None:
-            return None, None
-
-        col, row = cell
-        current_state = self.grid_data.get_cell(col, row)
-        target_state = not current_state
-        #draw_line_on_grid(grid, cell, cell, target_state)
-        
-        return target_state, cell
-
-
-    @staticmethod
-    def point_in_rect(pos, rect) -> bool:
-        """Sprawdza, czy punkt (x, y) znajduje się w prostokącie."""
-        x, y = pos
-        rx, ry, rw, rh = rect
-        return rx <= x < rx + rw and ry <= y < ry + rh
+        x0, y0 = start_cell
+        x1, y1 = end_cell
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        sx = 1 if x0 < x1 else -1
+        sy = 1 if y0 < y1 else -1
+        err = dx - dy
+        while True:
+            self.grid_data.set_cell(x0, y0, state)
+            if x0 == x1 and y0 == y1:
+                break
+            e2 = err * 2
+            if e2 > -dy:
+                err -= dy
+                x0 += sx
+            if e2 < dx:
+                err += dx
+                y0 += sy
 
 
 
 class GridRenderer:
-    def __init__(self, screen, grid_data: GridData, grid_geometry: GridGeometry):
+    def __init__(self, screen):
         self.screen = screen
         
-        self.grid_data = grid_data
-        self.grid_geometry = grid_geometry
 
-
-    def render_outline(self):
+    def render_outline(self, grid_geometry: GridGeometry):
         """
         Rysuje pustą planszę oraz kontury siatki.
         To realizuje zadanie: renderowanie konturu siatki.
@@ -159,50 +146,62 @@ class GridRenderer:
         pygame.draw.rect(
             self.screen,
             config.BACKGROUND_COLOR,
-            (self.x, self.y, self.width, self.height)
+            (grid_geometry.x, grid_geometry.y, grid_geometry.width, grid_geometry.height)
         )
 
         # Linie pionowe
-        for x in range(self.x, self.x + self.width + 1, self.cell_size):
+        for x in range(grid_geometry.x, grid_geometry.x + grid_geometry.width + 1, grid_geometry.cell_size):
             pygame.draw.line(
                 self.screen,
-                config.LINE_COLOR,
-                (x, self.y),
-                (x, self.y + self.height)
+                config.GRID_LINE_COLOR,
+                (x, grid_geometry.y),
+                (x, grid_geometry.y + grid_geometry.height)
             )
 
         # Linie poziome
-        for y in range(self.y, self.y + self.height + 1, self.cell_size):
+        for y in range(grid_geometry.y, grid_geometry.y + grid_geometry.height + 1, grid_geometry.cell_size):
             pygame.draw.line(
                 self.screen,
-                config.LINE_COLOR,
-                (self.x, y),
-                (self.x + self.width, y)
+                config.GRID_LINE_COLOR,
+                (grid_geometry.x, y),
+                (grid_geometry.x + grid_geometry.width, y)
             )
 
         pygame.draw.rect(
             self.screen,
-            config.BORDER_COLOR,
-            (self.x, self.y, self.width, self.height),
+            config.GRID_BORDER_COLOR,
+            (grid_geometry.x, grid_geometry.y, grid_geometry.width, grid_geometry.height),
             2
         )
 
 
-    def render_cells(self):
+    def render_cells(self, grid_data: GridData, grid_geometry: GridGeometry):
         """
         Rysuje żywe komórki na podstawie aktualnego stanu obiektu Grid.
         To realizuje zadanie: wizualizacja stanu komórek na siatce.
         """
-        rows, cols = self.grid.shape
+        rows, cols = grid_data.shape
 
         for row in range(rows):
             for col in range(cols):
-                if self.grid_data.get_cell(row, col):
-                    x = self.x + col * self.cell_size
-                    y = self.y + row * self.cell_size
+                if grid_data.get_cell(x=col, y=row):
+                    x = grid_geometry.x + col * grid_geometry.cell_size
+                    y = grid_geometry.y + row * grid_geometry.cell_size
 
                     pygame.draw.rect(
                         self.screen,
                         config.ALIVE_CELL_COLOR,
-                        (x + 2, y + 2, self.cell_size - 4, self.cell_size - 4)
+                        (x + 2, y + 2, grid_geometry.cell_size - 4, grid_geometry.cell_size - 4)
                     )
+
+
+
+def fill_grid_randomly(grid, chance=0.2):
+    """Losowo ustawia część komórek jako żywe, żeby było co wizualizować."""
+    rows, cols = grid.shape
+
+    for row in range(rows):
+        for col in range(cols):
+            if random.random() < chance:
+                grid.set_cell(col, row, True)
+

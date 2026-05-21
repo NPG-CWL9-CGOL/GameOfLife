@@ -2,7 +2,8 @@ import pygame
 
 from dataclasses import dataclass
 
-import gameoflife.config as config
+from gameoflife import config
+
 
 @dataclass
 class ViewRect:
@@ -18,12 +19,14 @@ class ViewRect:
 
 @dataclass
 class ViewText:
-    text: set
+    text: str
     x: int
     y: int
     
     color: tuple[int, int, int] = config.TEXT_COLOR
-    font: pygame.font.Font
+    font: str = "text_font"
+
+    centered: bool = False
 
 
 @dataclass
