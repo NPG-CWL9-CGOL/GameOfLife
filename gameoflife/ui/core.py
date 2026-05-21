@@ -12,6 +12,8 @@ from gameoflife.ui.components import GlobalComponent, UIComponent
 from gameoflife.ui.views import *
 
 
+# TODO: dynamic component boundaries
+
 UI_RECTS = [
     (570, 25, 90, 35),
     (670, 25, 90, 35),

@@ -155,7 +155,6 @@ class GridRenderer:
     def render_outline(self, grid_geometry: GridGeometry) -> None:
         """
         Rysuje pustą planszę oraz kontury siatki.
-        To realizuje zadanie: renderowanie konturu siatki.
         """
         pygame.draw.rect(
             self.screen,
@@ -192,7 +191,6 @@ class GridRenderer:
     def render_cells(self, grid_data: GridData, grid_geometry: GridGeometry) -> None:
         """
         Rysuje żywe komórki na podstawie aktualnego stanu obiektu Grid.
-        To realizuje zadanie: wizualizacja stanu komórek na siatce.
         """
         rows, cols = grid_data.shape
 

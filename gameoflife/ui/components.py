@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import TYPE_CHECKING, Callable, Any, Iterator
+from typing import TYPE_CHECKING, Callable, Any, Iterator, Optional
 
 from gameoflife import config
 from gameoflife.settings import AppSettings
@@ -21,7 +21,7 @@ class UIComponent(ABC):
         self.ui_state = ui_state
 
         self.layout_cached = None
-        self.subcomponents_cached: dict[str, UIComponent] = None
+        self.subcomponents_cached: Optional[dict[str, UIComponent]] = None
 
     def get_layout(self) -> list:
         """Zwraca listę widoków (Views) definiujących wygląd komponentu."""
@@ -66,7 +66,7 @@ class EmptyComponent(UIComponent):
 
 
 class QuickComponent(UIComponent):
-    def __init__(self, view: any):
+    def __init__(self, view: object):
         super().__init__(None) # state for that case is None
 
         self.view = view

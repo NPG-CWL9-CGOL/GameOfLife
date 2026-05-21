@@ -70,7 +70,7 @@ class App:
                 self.renderer.render_grid(
                     self.grid_data, self.grid_geometry)
 
-            self.renderer.render_end()
+            self.renderer.render_flush()
 
             clock.tick(config.FPS)
 
@@ -153,7 +153,7 @@ class AppRenderer:
         for component in components:
             self.ui_renderer.render_component(component)
 
-    def render_end(self) -> None:
-        """Czyści tło"""
+    def render_flush(self) -> None:
+        """Odświeżanie ekranu"""
         pygame.display.flip()
     
