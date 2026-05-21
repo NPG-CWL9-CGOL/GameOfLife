@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from gameoflife.grid import GridData, GridGeometry
 from gameoflife.settings import AppSettings
 
@@ -63,14 +65,14 @@ class UIHandler:
 
 
 
-    def get_active_components(self):
+    def get_active_components(self) -> list[UIComponent]:
         return [
             self.global_component.get("main_title"),
             self.global_component.get(self.state.current_screen)
         ]
 
 
-    def mouse_button_down(self, event):
+    def mouse_button_down(self, event: pygame.event.Event) -> None:
         if event.button != 1:
             return
         
@@ -85,14 +87,14 @@ class UIHandler:
             self.state.drag_target_state, self.state.drag_previous_cell = self.handle_grid_click(event)
 
 
-    def mouse_motion(self, event):
+    def mouse_motion(self, event: pygame.event.Event) -> None:
         if self.state.current_screen != "main" or self.state.drag_target_state is None:
             return
         
         self.state.drag_previous_cell = self.continue_grid_drag(event)
     
 
-    def mouse_button_up(self, event):
+    def mouse_button_up(self, event: pygame.event.Event) -> None:
         if event.button != 1:
             return
         
@@ -100,7 +102,7 @@ class UIHandler:
         self.state.drag_previous_cell = None
 
 
-    def handle_grid_click(self, event):
+    def handle_grid_click(self, event: pygame.event.Event) -> tuple[bool | None, tuple[int, int] | None]:
         """Obsługa kliknięcia w siatkę, z pominięciem obszarów UI.
         Zwraca stan pędzla dla przeciągania komórek."""
         if self.state.editing is False:
@@ -126,7 +128,7 @@ class UIHandler:
 
         
     #to reaguje na mousemotion, wazne w nowej petli zdarzen 
-    def continue_grid_drag(self, event):
+    def continue_grid_drag(self, event: pygame.event.Event) -> tuple[int, int] | None:
         """Obsługa przeciągania myszy po siatce w trakcie edycji."""
 
         if not self.state.editing or self.state.drag_target_state is None or self.state.drag_previous_cell is None:
@@ -148,7 +150,7 @@ class UIHandler:
 
 
 class UIRenderer:
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.Surface):
         self.screen = screen
 
         self._render_dispatch = {
@@ -165,7 +167,7 @@ class UIRenderer:
         }
 
 
-    def render_component(self, component: UIComponent):
+    def render_component(self, component: UIComponent) -> None:
         for view in component.views:
             render_method = self._render_dispatch.get(type(view))
             
@@ -175,7 +177,7 @@ class UIRenderer:
                 print(f"Warning: No rendering method registered for {type(view)}")
 
 
-    def render_rect(self, rect_view: ViewRect):
+    def render_rect(self, rect_view: ViewRect) -> None:
         rect = pygame.Rect(
             rect_view.x,
             rect_view.y,
@@ -192,7 +194,7 @@ class UIRenderer:
             rect_view.border_radius)
 
 
-    def render_text(self, text_view: ViewText):
+    def render_text(self, text_view: ViewText) -> None:
         text = self.fonts[text_view.font].render(
             text_view.text, True, text_view.color)
         
@@ -204,5 +206,5 @@ class UIRenderer:
             self.screen.blit(text, (text_view.x, text_view.y))
 
 
-    def render_background(self, bg_view: ViewBackgroundColor):
+    def render_background(self, bg_view: ViewBackgroundColor) -> None:
         self.screen.fill(bg_view.color)

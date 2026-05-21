@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC
+from typing import TYPE_CHECKING, Callable, Any, Iterator
 
 from gameoflife import config
 from gameoflife.settings import AppSettings
 from gameoflife.ui.views import ViewBackgroundColor, ViewRect, ViewText
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from gameoflife.ui.core import UIState
@@ -19,13 +18,13 @@ class UIComponent(ABC):
         self.layout_cached = None
         self.subcomponents_cached: dict[str, UIComponent] = None
 
-    def get_layout(self):
+    def get_layout(self) -> list:
         return []
 
     def get_subcomponents(self) -> dict[str, UIComponent]:
         return {}
 
-    def get(self, name: str) -> UIComponent:
+    def get(self, name: str) -> UIComponent | None:
         if self.subcomponents_cached == None:
             return None
         
@@ -43,7 +42,7 @@ class UIComponent(ABC):
     def views(self):
         return self.layout_cached
 
-    def notify_changed(self):
+    def notify_changed(self) -> None:
         self.build_layout()
 
 
@@ -89,10 +88,10 @@ class Button(UIComponent):
 
         self._click_handlers = []
 
-    def get_rect(self):
+    def get_rect(self) -> tuple[int, int, int, int]:
         return (self.x, self.y, self.width, self.height)
 
-    def get_layout(self):
+    def get_layout(self) -> list:
         return [
             ViewRect(
                 self.x, self.y,
@@ -109,7 +108,7 @@ class Button(UIComponent):
                 font=self.font)
         ]
 
-    def on_click(self, callback):
+    def on_click(self, callback: Callable[[], Any]) -> Callable[[], Any]:
         """
         Dodanie funkcji odwołania na kliknięcie.
         Może być użyte jako dekorator.
@@ -120,7 +119,7 @@ class Button(UIComponent):
         self._click_handlers.append(callback)
         return callback
 
-    def click(self):
+    def click(self) -> None:
         for handler in self._click_handlers:
             handler()
     
@@ -170,7 +169,7 @@ class SettingsPage(UIComponent):
         ]
 
 
-    def get_settings_views(self):
+    def get_settings_views(self) -> Iterator[ViewText]:
         settings = self.ui_state.settings
         settings_lines = [
             "Simulation:",

@@ -13,7 +13,14 @@ from gameoflife.ui.views import *
 
 
 class App:
-    def __init__(self, renderer: AppRenderer, ui_handler: UIHandler, settings, grid_data, grid_geometry):
+    def __init__(
+        self,
+        renderer: AppRenderer,
+        ui_handler: UIHandler,
+        settings: AppSettings,
+        grid_data: GridData,
+        grid_geometry: GridGeometry
+    ) -> None:
         self.renderer = renderer
         self.ui_handler = ui_handler
         self.settings = settings
@@ -23,7 +30,7 @@ class App:
         self.running = True
 
     @classmethod
-    def create(cls):
+    def create(cls) -> App:
         renderer = AppRenderer(
             window_size=(config.WINDOW_WIDTH, config.WINDOW_HEIGHT),
             window_title=config.WINDOW_TITLE)
@@ -42,7 +49,7 @@ class App:
             renderer, ui_handler, settings, grid_data, grid_geometry)
 
 
-    def run(self):
+    def run(self) -> None:
         clock = pygame.time.Clock()
     
         while self.running:
@@ -61,7 +68,7 @@ class App:
             clock.tick(config.FPS)
 
 
-    def handle_events(self):
+    def handle_events(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
@@ -75,7 +82,7 @@ class App:
 
 
     @staticmethod
-    def create_grid(grid_x: int, grid_y:int):
+    def create_grid(grid_x: int, grid_y: int) -> tuple[GridData, GridGeometry]:
         grid_width = 740
         grid_height = 380
         cell_size = 20
@@ -115,25 +122,23 @@ class AppRenderer:
         self.ui_renderer = UIRenderer(self.screen)
 
 
-    def __del__(self):        
+    def __del__(self) -> None:        
         pygame.quit()
  
 
-    def render_begin(self):
+    def render_begin(self) -> None:
         pygame.draw.rect(self.screen, config.BOTTOM_PANEL_COLOR, (0, 500, self.window_size[0], 100))
 
 
-    def render_grid(self, grid_data: GridData, grid_geometry: GridGeometry):                
+    def render_grid(self, grid_data: GridData, grid_geometry: GridGeometry) -> None:                
         self.grid_renderer.render_outline(grid_geometry)
         self.grid_renderer.render_cells(grid_data, grid_geometry)
 
 
-    def render_ui(self, components: list[UIComponent]):
+    def render_ui(self, components: list[UIComponent]) -> None:
         for component in components:
             self.ui_renderer.render_component(component)
 
-    def render_end(self):
+    def render_end(self) -> None:
         pygame.display.flip()
     
-
-

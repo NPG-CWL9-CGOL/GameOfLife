@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 
 import pygame
@@ -9,14 +11,13 @@ from gameoflife.math_utils import point_in_rect
 from gameoflife.patterns import get_pattern
 
 
-
 class GridData:
     def __init__(self, rows: int = 0, cols: int = 0) -> None:
         """Inicjalizacja siatki o danej wielkości"""
         self._grid: np.ndarray = np.zeros((rows, cols), dtype=np.bool_)
 
     @classmethod
-    def from_data(cls, data: np.ndarray):
+    def from_data(cls, data: np.ndarray) -> GridData:
         """Inicjalizacja obiektu z istniejącej siatki (NIE kopiuje)"""
         grid = cls(*data.shape)
         grid._grid = data
@@ -90,7 +91,7 @@ class GridData:
 
 
 class GridGeometry:
-    def __init__(self, grid_data: GridData, x, y, width, height, cell_size):
+    def __init__(self, grid_data: GridData, x: int, y: int, width: int, height: int, cell_size: int):
         self.grid_data = grid_data
 
         self.x = x
@@ -99,7 +100,7 @@ class GridGeometry:
         self.height = height
         self.cell_size = cell_size
 
-    def get_cell(self, pos):
+    def get_cell(self, pos: tuple[int, int]) -> tuple[int, int] | None:
         mx, my = pos
         if not (self.x <= mx < self.x + self.width and self.y <= my < self.y + self.height):
             return None
@@ -109,7 +110,7 @@ class GridGeometry:
         return col, row
 
 
-    def draw_line(self, start_cell, end_cell, state):
+    def draw_line(self, start_cell: tuple[int, int], end_cell: tuple[int, int], state: bool) -> None:
         """Rysuje linię komórek między dwoma punktami na siatce."""
         
         x0, y0 = start_cell
@@ -134,11 +135,11 @@ class GridGeometry:
 
 
 class GridRenderer:
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.Surface):
         self.screen = screen
         
 
-    def render_outline(self, grid_geometry: GridGeometry):
+    def render_outline(self, grid_geometry: GridGeometry) -> None:
         """
         Rysuje pustą planszę oraz kontury siatki.
         To realizuje zadanie: renderowanie konturu siatki.
@@ -175,7 +176,7 @@ class GridRenderer:
         )
 
 
-    def render_cells(self, grid_data: GridData, grid_geometry: GridGeometry):
+    def render_cells(self, grid_data: GridData, grid_geometry: GridGeometry) -> None:
         """
         Rysuje żywe komórki na podstawie aktualnego stanu obiektu Grid.
         To realizuje zadanie: wizualizacja stanu komórek na siatce.
@@ -196,7 +197,7 @@ class GridRenderer:
 
 
 
-def fill_grid_randomly(grid, chance=0.2):
+def fill_grid_randomly(grid: GridData, chance: float = 0.2) -> None:
     """Losowo ustawia część komórek jako żywe, żeby było co wizualizować."""
     rows, cols = grid.shape
 
@@ -204,4 +205,3 @@ def fill_grid_randomly(grid, chance=0.2):
         for col in range(cols):
             if random.random() < chance:
                 grid.set_cell(col, row, True)
-
