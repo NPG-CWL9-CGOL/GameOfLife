@@ -1,3 +1,5 @@
+"""Moduł definiujący komponenty interfejsu użytkownika (UI)."""
+
 from __future__ import annotations
 
 from abc import ABC
@@ -12,25 +14,32 @@ if TYPE_CHECKING:
 
 
 class UIComponent(ABC):
+    """Abstrakcyjna klasa bazowa dla wszystkich komponentów interfejsu."""
+
     def __init__(self, ui_state: UIState):
+        """Inicjalizuje komponent z odniesieniem do stanu UI."""
         self.ui_state = ui_state
 
         self.layout_cached = None
         self.subcomponents_cached: dict[str, UIComponent] = None
 
     def get_layout(self) -> list:
+        """Zwraca listę widoków (Views) definiujących wygląd komponentu."""
         return []
 
     def get_subcomponents(self) -> dict[str, UIComponent]:
+        """Zwraca słownik subkomponentów należących do tego komponentu."""
         return {}
 
     def get(self, name: str) -> UIComponent | None:
+        """Pobiera subkomponent o podanej nazwie z pamięci podręcznej."""
         if self.subcomponents_cached == None:
             return None
         
         return self.subcomponents_cached.get(name)
 
     def build_layout(self):
+        """Buduje i odświeża układ komponentu oraz wszystkich jego subkomponentów."""
         self.layout_cached = self.get_layout()
         self.subcomponents_cached = self.get_subcomponents()
 
@@ -40,14 +49,19 @@ class UIComponent(ABC):
 
     @property
     def views(self):
+        """Zwraca wygenerowane widoki komponentu."""
         return self.layout_cached
 
     def notify_changed(self) -> None:
+        """Informuje komponent o zmianie, wymuszając przebudowanie układu."""
         self.build_layout()
 
 
 class EmptyComponent(UIComponent):
+    """Komponent reprezentujący pusty obszar."""
+
     def get_layout(self):
+        """Zwraca pusty układ."""
         return []
 
 
@@ -56,6 +70,7 @@ class QuickComponent(UIComponent):
         super().__init__(None) # state for that case is None
 
         self.view = view
+        """Komponent pozwalający na szybkie opakowanie pojedynczego widoku."""
 
     def get_layout(self):
         return [ self.view ]
@@ -120,11 +135,13 @@ class Button(UIComponent):
         return callback
 
     def click(self) -> None:
+        """Wywołuje wszystkie zarejestrowane funkcje obsługi kliknięcia."""
         for handler in self._click_handlers:
             handler()
     
 
 class MainPage(UIComponent):
+    """Komponent reprezentujący główny ekran aplikacji z kontrolkami symulacji."""
     def get_subcomponents(self):
         return {
             "settings_btn": Button(self.ui_state, 670, 25, 90, 35, "Settings"),
@@ -146,6 +163,7 @@ class MainPage(UIComponent):
     
 
 class SettingsPage(UIComponent):
+    """Komponent reprezentujący ekran ustawień aplikacji."""
     def __init__(self, ui_state: UIState):
         super().__init__(ui_state)
 
@@ -170,6 +188,7 @@ class SettingsPage(UIComponent):
 
 
     def get_settings_views(self) -> Iterator[ViewText]:
+        """Generuje widoki tekstowe dla poszczególnych opcji ustawień."""
         settings = self.ui_state.settings
         settings_lines = [
             "Simulation:",
@@ -201,6 +220,7 @@ class SettingsPage(UIComponent):
 
 
 class GlobalComponent(UIComponent):
+    """Główny komponent kontenerowy przechowujący wszystkie ekrany aplikacji."""
     def __init__(self, ui_state: UIState):
         super().__init__(ui_state)
 
